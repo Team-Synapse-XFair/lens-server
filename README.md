@@ -12,7 +12,7 @@
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/Team-Synapse-XFair/lens-server.git
-cd infralens-backend
+cd lens-server
 ```
 
 ### 2. Create & activate a virtual environment
