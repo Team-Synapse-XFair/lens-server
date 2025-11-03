@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+flask/
+
+# Flask & Config
+instance/
+config.py
+.env
+.env.*
+*.secret
+*.key
+
+# MongoDB (if using local dev Mongo data dirs)
+data/
+dump/
+*.bson
+*.json
+
+# IDE
+.vscode/

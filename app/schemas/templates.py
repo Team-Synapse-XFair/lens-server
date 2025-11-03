@@ -1,0 +1,72 @@
+from datetime import datetime
+from bson import ObjectId
+
+def ImageTemplate() :
+    return {
+        'report_id': ObjectId(), ## Report this image is associated with
+        'file_path': '', ## path or URL to the stored image
+        'uploaded_at': datetime.now(),
+        'metadata': {}, ## ex: camera info, geotagging, etc.
+    }
+
+def CommentTemplate() :
+    return {
+        'report_id': ObjectId(), ## Report this comment is associated with
+        'user_id': ObjectId(), ## User who made the comment
+        'content': '',
+        'created_at': datetime.now(),
+        'updated_at': datetime.now(),
+    }
+
+def LocationTemplate() :
+    return {
+        'latitude': 0.0,
+        'longitude': 0.0,
+        'address': '',
+        'city': '',
+        'state': '',
+        'postal_code': '',
+    }
+
+def UserTemplate() :
+    return {
+        'username': '',
+        'email': '',
+        'hashed_password': '',
+        'full_name': '',
+        'role': '', ## ex: 'admin', 'citizen', 'official'
+        'joined_at': datetime.now(),
+        'reports_submitted': [], ## list of report ObjectIds
+        'profile': {}, ## additional profile info (city, organiztion, verified, etc.) organization only used when role is 'official'
+    }
+
+def ProjectTemplate() :
+    return {
+        'name': '',
+        'department': '', ## Under which city department this project falls
+        'budget': 0.0,
+        'status': '', ## ex: 'planning', 'in_progress', 'completed'
+        'progress': 0, ## percentage 0-100
+        'ai_summary': {}, ## ai-generated project summary/insights (risk level, accountability, etc.)
+        'start_date': datetime.now(),
+        'end_date': datetime.now(),
+        'location': ObjectId(), ## Location ObjectId
+        'reports': [], ## list of associated Report ObjectIds
+        'last_updated': datetime.now(),
+    }
+
+def ReportTemplate() :
+    return {
+        'user_id': ObjectId(), ## User who reported
+        'title': '',
+        'description': '',
+        'project_id': ObjectId(), ## Associated project (if any)
+        'category': '', ## ex: 'road_damage', 'streetlight_outage', 'water_leak' etc.
+        'location': ObjectId(), ## latitude/longitude/local address
+        'images': [], ## list of image ObjectIds (each image stored separately in 'images' collection)
+        'status': '', ## ex: 'pending', 'verified', 'resolved', 'rejected'
+        'ai_analysis': {}, ## ai-generated insights (e.g. detected damage, severity, confidence, etc.)
+        'created_at': datetime.now(), ## self explanatory
+        'updated_at': datetime.now(), ## self explanatory
+        'comments': [], ## list of comment ObjectIds (each comment stored in 'comments' collection)
+    }
