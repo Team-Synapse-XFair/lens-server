@@ -21,14 +21,15 @@ def create_app():
         module_name = f"app.routes.{module_info.name}"
         module = importlib.import_module(module_name)
 
+        # Register any Blueprint object found in the module
         for attr_name in dir(module):
             attr = getattr(module, attr_name)
             if getattr(attr, "__class__", None).__name__ == "Blueprint":
-                blueprint_prefix = f"/{module_info.name}" if module_info.name != "main" else ""
+                blueprint_prefix = attr.url_prefix or ""
 
                 bp_prefix = getattr(module, "bp_prefix", blueprint_prefix)
 
-                full_prefix = f"/auth/{API_VERSION}{bp_prefix}"
+                full_prefix = f"/api/{API_VERSION}{bp_prefix}"
                 app.register_blueprint(attr, url_prefix=full_prefix)
 
                 print(f"Registered {module_info.name} → {full_prefix}")

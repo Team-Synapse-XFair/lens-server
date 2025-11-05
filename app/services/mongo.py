@@ -1,45 +1,46 @@
-# import os
-# from datetime import datetime
-# from pymongo import MongoClient
-
-# MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-# client = MongoClient(MONGO_URI)
-
-# MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "lens_dev")
-# db = client[MONGO_DB_NAME]
-
-# reports = db['reports']
-
-# def insertReport(data):
-#     ## TODO Implement proper shcema logic and user validation
-
-#     ## NOTE Ignore this table structure, check app/schemas/templates.py for intended structure
-#     report = {
-#         'user_id': data.get('user_id', 'anonymous'),
-#         'title': data.get('title', 'Untitled Report'),
-#         'description': data.get('description', ''),
-#         'category': data.get('category', 'general'),
-#         'location': data.get('location', {}),
-#         'images': data.get('images', []),
-#         'status': data.get('status', 'pending'),
-#         'ai_analysis': data.get('ai_analysis', {}),
-#         'created_at': data.get('created_at', datetime.now()),
-#         'updated_at': data.get('updated_at', datetime.now()),
-#         'comments': data.get('comments', []),
-#     }
-#     result = reports.insert_one(report)
-#     return str(result.inserted_id)
 from pymongo import MongoClient
 import os
+from datetime import datetime
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 client = MongoClient(MONGO_URI)
 
 MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "lens_dev")
-db = client[MONGO_DB_NAME]
 
-reports = db["reports"]
+def getDB(db_name=MONGO_DB_NAME):
+    return client[db_name]
 
-def insertReport(report):
+def checkConnection():
+    try:
+        # The ismaster command is cheap and does not require auth.
+        client.admin.command('ismaster')
+        return True
+    except Exception as e:
+        print(f"MongoDB connection error: {e}")
+        return False
+    
+def getUser(email):
+    if not checkConnection():
+        raise ConnectionError("Unable to connect to MongoDB")
+
+    users = getDB()['users']
+    user = users.find_one({'email': email})
+    return user
+
+def saveReport(report):
+    if not checkConnection():
+        raise ConnectionError("Unable to connect to MongoDB")
+
+    reports = getDB()['reports']
+    
     result = reports.insert_one(report)
+    return str(result.inserted_id)
+
+def saveUser(user):
+    if not checkConnection():
+        raise ConnectionError("Unable to connect to MongoDB")
+
+    users = getDB()['users']
+    
+    result = users.insert_one(user)
     return str(result.inserted_id)

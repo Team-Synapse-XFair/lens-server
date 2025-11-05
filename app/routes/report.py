@@ -1,21 +1,21 @@
 from flask import Blueprint, jsonify, request
 from bson import ObjectId
 from datetime import datetime
-from app.services.mongo import insertReport
+from app.services.mongo import saveReport
 from app.schemas.templates import ReportTemplate
+from app.utils.require_auth import require_auth
 
 reportBP = Blueprint("report", __name__)
 
-@reportBP.route("/", methods=["POST"])
+@reportBP.route("/report", methods=["POST"])
+@require_auth
 def create_report():
     data = request.json or {}
+    user = request.user  # NOTE Set by require_auth decorator
     
-    # 1. Start with the base report template
     report = ReportTemplate()
 
-    # 2. Fill in report details from request data
-    if data.get("user_id"):
-        report["user_id"] = ObjectId(data["user_id"])
+    report["user_id"] = ObjectId(user['user_id'])
     report["title"] = data.get("title", "Untitled Report")
     report["description"] = data.get("description", "")
     report["category"] = data.get("category", "general")
@@ -24,7 +24,7 @@ def create_report():
     report["created_at"] = datetime.now()
     report["updated_at"] = datetime.now()
 
-    # 3. Handle location (can be objectId or dict)
+    # TODO Handle locations from frontend properly
     if data.get("location"):
         loc = data["location"]
         if isinstance(loc, str) and ObjectId.is_valid(loc):
@@ -32,7 +32,7 @@ def create_report():
         else:
             report["location"] = loc  # e.g. a dict of lat/lng
 
-    # 4. Handle images — must be ObjectIds if exist
+    # TODO Handle images from frontend properly
     if data.get("images"):
         valid_imgs = []
         for img in data["images"]:
@@ -40,16 +40,8 @@ def create_report():
                 valid_imgs.append(ObjectId(img))
         report["images"] = valid_imgs
 
-    # 5. Handle comments similarly
-    if data.get("comments"):
-        valid_comments = []
-        for c in data["comments"]:
-            if isinstance(c, str) and ObjectId.is_valid(c):
-                valid_comments.append(ObjectId(c))
-        report["comments"] = valid_comments
+    # TODO Implement project association
 
-    # 6. Save the report to MongoDB
-    inserted_id = insertReport(report)
+    inserted_id = saveReport(report)
 
-    # 7. Send a response
-    return jsonify({"id": inserted_id, "message": "Report saved"}), 201
+    return jsonify({"id": inserted_id, "message": "Saved"}), 201
