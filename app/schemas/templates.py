@@ -81,3 +81,21 @@ def ReportTemplate() :
         'updated_at': datetime.now(), ## self explanatory
         'comments': [], ## list of comment ObjectIds (each comment stored in 'comments' collection)
     }
+
+def BuilderTemplate():
+    return {
+        "_id": ObjectId(),  # unique builder id
+        "name": "",
+        "estd": datetime.now(),  # or year if you prefer
+        "hq_location": "",  # main office / HQ
+        "contact": {
+            "email": "",
+            "phone": "",
+            "website": ""
+        },
+        "projects": [],  # list of associated Project ObjectIds
+        "accountability_score": 0,  # numeric 0–100 or similar
+        "comments": [],  # list of Comment ObjectIds
+        "created_at": datetime.now(),
+        "updated_at": datetime.now()
+    }
