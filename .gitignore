@@ -13,6 +13,7 @@ config.py
 .env.*
 *.secret
 *.key
+*.bat
 
 # MongoDB (if using local dev Mongo data dirs)
 data/

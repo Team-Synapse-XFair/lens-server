@@ -1,12 +1,22 @@
 from datetime import datetime
 from bson import ObjectId
 
+def FileTemplate() :
+    return {
+        'filename': '',
+        'filepath': '',
+        'uploaded_at': datetime.now(),
+        'uploaded_by': ObjectId(), ## User who uploaded
+        'file_type': '', ## ex: 'image/png', 'application/pdf', etc.
+        'metadata': {}, ## any additional metadata
+    }
+
 def ImageTemplate() :
     return {
+        'file_id': ObjectId(), ## Reference to File document
         'report_id': ObjectId(), ## Report this image is associated with
-        'file_path': '', ## path or URL to the stored image
         'uploaded_at': datetime.now(),
-        'metadata': {}, ## ex: camera info, geotagging, etc.
+        'description': '',
     }
 
 def CommentTemplate() :
@@ -60,6 +70,7 @@ def ReportTemplate() :
         'user_id': ObjectId(), ## User who reported
         'title': '',
         'description': '',
+        'severity': '', ## ex: 'low', 'medium', 'high'
         'project_id': ObjectId(), ## Associated project (if any)
         'category': '', ## ex: 'road_damage', 'streetlight_outage', 'water_leak' etc.
         'location': ObjectId(), ## latitude/longitude/local address

@@ -17,6 +17,7 @@ def create_report():
 
     report["user_id"] = ObjectId(user['user_id'])
     report["title"] = data.get("title", "Untitled Report")
+    report ["severity"] = data.get("severity", "low")
     report["description"] = data.get("description", "")
     report["category"] = data.get("category", "general")
     report["status"] = data.get("status", "pending")
@@ -44,4 +45,4 @@ def create_report():
 
     inserted_id = saveReport(report)
 
-    return jsonify({"id": inserted_id, "message": "Saved"}), 201
+    return jsonify({"id": inserted_id, "message": "Saved", "success": True}), 201

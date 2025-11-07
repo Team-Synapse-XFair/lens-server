@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import os
 from datetime import datetime
+from bson import ObjectId
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 client = MongoClient(MONGO_URI)
@@ -12,7 +13,7 @@ def getDB(db_name=MONGO_DB_NAME):
 
 def checkConnection():
     try:
-        # The ismaster command is cheap and does not require auth.
+        # cheap and does not require auth
         client.admin.command('ismaster')
         return True
     except Exception as e:
@@ -44,3 +45,50 @@ def saveUser(user):
     
     result = users.insert_one(user)
     return str(result.inserted_id)
+
+def saveFileRecord(file_doc):
+    if not checkConnection():
+        raise ConnectionError("Unable to connect to MongoDB")
+
+    files = getDB()['files']
+    
+    result = files.insert_one(file_doc)
+    return str(result.inserted_id)
+
+def saveImage(image_doc):
+    if not checkConnection():
+        raise ConnectionError("Unable to connect to MongoDB")
+
+    images = getDB()['images']
+    
+    result = images.insert_one(image_doc)
+    return str(result.inserted_id)
+
+def getFileById(file_id):
+    if not checkConnection():
+        raise ConnectionError("Unable to connect to MongoDB")
+
+    files = getDB()['files']
+    file_doc = files.find_one({'_id': ObjectId(file_id)})
+    return file_doc
+
+def getFileByHash(file_hash):
+    if not checkConnection():
+        raise ConnectionError("Unable to connect to MongoDB")
+    
+    files = getDB()['files']
+    file_doc = files.find_one({'sha-256-hash': file_hash})
+    return file_doc
+
+def saveImages(images):
+    if not checkConnection():
+        raise ConnectionError("Unable to connect to MongoDB")
+
+    images = getDB()['images']
+    
+    result = images.insert_many(images)
+    ids = []
+    for id in result.inserted_ids:
+        ids.append(str(id))
+
+    return ids
