@@ -99,3 +99,15 @@ def BuilderTemplate():
         "created_at": datetime.now(),
         "updated_at": datetime.now()
     }
+
+def CommentTemplate():
+    """Generic comment structure usable across builders, reports, etc."""
+    return {
+        "_id": ObjectId(),
+        "parent_type": "",        # can be "builder", "report", "project"
+        "parent_id": ObjectId(),  # links to the entity being commented on
+        "user_id": ObjectId(),    # user who made the comment
+        "content": "",
+        "created_at": datetime.now(),
+        "updated_at": datetime.now()
+    }
