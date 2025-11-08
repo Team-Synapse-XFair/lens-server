@@ -1,12 +1,12 @@
-import sys
 import hashlib
 
 BUF_SZ = 65536
 
+
 def generateFileHash(file):
     sha256 = hashlib.sha256()
 
-    with open(file, 'rb') as f:
+    with open(file, "rb") as f:
         while True:
             data = f.read(BUF_SZ)
             if not data:
@@ -15,9 +15,11 @@ def generateFileHash(file):
 
     return sha256.hexdigest()
 
+
 def verifyFileHash(file, hash):
     fileHash = generateFileHash(file)
     return fileHash == hash
+
 
 def verifyFiles(file1, file2):
     file1Hash = generateFileHash(file1)

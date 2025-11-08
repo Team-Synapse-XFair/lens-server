@@ -10,26 +10,27 @@ from app.services.auth import verify_password, hash_password
 
 authBP = Blueprint("auth", __name__, url_prefix="/auth")
 
+
 @authBP.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
     user = getUser(data.get("email"))
-    
+
     if not user:
         return jsonify({"message": "Invalid email or password"}), 401
-    
-    if not verify_password(user['hashed_password'], data.get("password")):
+
+    if not verify_password(user["hashed_password"], data.get("password")):
         return jsonify({"message": "Invalid email or password"}), 401
 
     secretKey = os.getenv("JWT_SECRET", "OkayIGuessThisIsSecureEnoughForDev")
 
     payload = {
-        'user_id': str(user["_id"]),
-        'email': user['email'],
-        'role': user['role'],
-        'exp': datetime.now() + timedelta(hours=24)
+        "user_id": str(user["_id"]),
+        "email": user["email"],
+        "role": user["role"],
+        "exp": datetime.now() + timedelta(hours=24),
     }
-    token = jwt.encode(payload, secretKey, algorithm='HS256')
+    token = jwt.encode(payload, secretKey, algorithm="HS256")
     print(f"Generated JWT for user {user['email']}")
 
     response = {
@@ -37,22 +38,25 @@ def login():
         "token": token,
         "user": {
             "id": str(user["_id"]),
-            "username": user['username'],
-            "email": user['email'],
-        }
+            "username": user["username"],
+            "email": user["email"],
+            "role": user["role"],
+        },
     }
 
-    return jsonify(response), 200, {'Content-Type': 'application/json'}
-    
+    return jsonify(response), 200, {"Content-Type": "application/json"}
+
+
 @authBP.route("/register", methods=["POST"])
 def register():
     ## TODO Implement user registration logic
     data = request.get_json()
 
-    if (not data.get("email") or
-        not data.get("username") or
-        not data.get("password") or
-        not data.get("name")
+    if (
+        not data.get("email")
+        or not data.get("username")
+        or not data.get("password")
+        or not data.get("name")
     ):
         return jsonify({"message": "Missing required fields"}), 400
 
@@ -61,10 +65,10 @@ def register():
     user["username"] = data["username"]
     user["name"] = data["name"]
     user["hashed_password"] = hash_password(data["password"])
-    user["role"] = "citizen" ## NOTE Default role
+    user["role"] = "citizen"  ## NOTE Default role
     user["created_at"] = datetime.now()
     user["updated_at"] = datetime.now()
 
     saveUser(user)
 
-    return jsonify({ "success": True, "message": "Registered Successfuly" }), 201
+    return jsonify({"success": True, "message": "Registered Successfuly"}), 201

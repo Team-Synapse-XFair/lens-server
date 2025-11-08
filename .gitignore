@@ -13,7 +13,8 @@ config.py
 .env.*
 *.secret
 *.key
-*.bat
+CountLines.bat
+uploads/
 
 # MongoDB (if using local dev Mongo data dirs)
 data/

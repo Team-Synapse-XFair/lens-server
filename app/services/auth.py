@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timedelta
 from argon2 import PasswordHasher
 
+
 def verify_token(token):
     JWT_SECRET = os.getenv("JWT_SECRET", "OkayIGuessThisIsSecureEnoughForDev")
     try:
@@ -14,12 +15,13 @@ def verify_token(token):
     except jwt.InvalidTokenError:
         print("Invalid token")
         return None
-    
+
 
 def hash_password(password):
-    
+
     passHasher = PasswordHasher(parallelism=1, time_cost=2, memory_cost=19456)
     return passHasher.hash(password)
+
 
 def verify_password(hashed_password, plain_password):
     passHasher = PasswordHasher(parallelism=1, time_cost=2, memory_cost=19456)
@@ -28,14 +30,15 @@ def verify_password(hashed_password, plain_password):
         return True
     except:
         return False
-    
+
+
 def generate_jwt(user_id, email, role, hours_valid=24):
     JWT_SECRET = os.getenv("JWT_SECRET", "OkayIGuessThisIsSecureEnoughForDev")
     payload = {
-        'user_id': str(user_id),
-        'email': email,
-        'role': role,
-        'exp': datetime.now() + timedelta(hours=hours_valid)
+        "user_id": str(user_id),
+        "email": email,
+        "role": role,
+        "exp": datetime.now() + timedelta(hours=hours_valid),
     }
-    token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
+    token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
     return token

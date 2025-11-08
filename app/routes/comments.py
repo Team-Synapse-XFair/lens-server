@@ -1,21 +1,14 @@
 from flask import Blueprint, request, jsonify
 from bson import ObjectId
 from datetime import datetime
-from app import mongo
 from app.schemas.templates import CommentTemplate
-
+from app.services.mongo import saveComment, getAllComments
+from app.utils.require_auth import require_auth
+from app.utils.serialize import serialize_comment
 comment_bp = Blueprint("comment_bp", __name__, url_prefix="/comments")
 
-
-def serialize_comment(comment):
-    comment["_id"] = str(comment["_id"])
-    comment["parent_id"] = str(comment["parent_id"])
-    comment["user_id"] = str(comment["user_id"])
-    return comment
-
-
-# --- create comment ---
 @comment_bp.route("/", methods=["POST"])
+@require_auth
 def create_comment():
     data = request.json or {}
 
@@ -34,26 +27,22 @@ def create_comment():
     comment["created_at"] = datetime.now()
     comment["updated_at"] = datetime.now()
 
-    mongo.db.comments.insert_one(comment)
+    result = saveComment(comment)
     return jsonify(serialize_comment(comment)), 201
 
 
-# --- get all comments ---
 @comment_bp.route("/", methods=["GET"])
+@require_auth
 def get_comments():
-    comments = list(mongo.db.comments.find())
+    comments = getAllComments()
     return jsonify([serialize_comment(c) for c in comments]), 200
 
 
-# --- get comments for a specific parent (optional) ---
 @comment_bp.route("/<parent_type>/<parent_id>", methods=["GET"])
+@require_auth
 def get_comments_for_parent(parent_type, parent_id):
     try:
-        comments = list(
-            mongo.db.comments.find(
-                {"parent_type": parent_type, "parent_id": ObjectId(parent_id)}
-            )
-        )
+        comments = getCommentsByParent(parent_type, ObjectId(parent_id))
         return jsonify([serialize_comment(c) for c in comments]), 200
     except:
         return jsonify({"error": "Invalid parent_id"}), 400

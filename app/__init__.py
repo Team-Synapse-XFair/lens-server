@@ -9,6 +9,7 @@ load_dotenv()
 
 API_VERSION = "v1"
 
+
 def create_app():
     app = Flask(__name__)
 
